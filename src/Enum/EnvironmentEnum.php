@@ -2,10 +2,8 @@
 
 namespace App\Enum;
 
-enum EnvironmentEnum: string
+class EnvironmentEnum
 {
-    use EnumTrait;
-
     const DEVELOPMENT = "development";
     const TEST = "test";
     const PRODUCTION = "production";

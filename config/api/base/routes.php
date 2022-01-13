@@ -1,12 +1,12 @@
 <?php
 
-use App\Api\Base\IndexController;
+use App\Api\Base\Home\HomeController;
 use App\Enum\RequestMethodEnum;
 
 return [
     "/" => [
         RequestMethodEnum::GET => [
-            "handler" => IndexController::class . "::read"
+            "handler" => HomeController::class . "::default"
         ]
-    ],
+    ]
 ];

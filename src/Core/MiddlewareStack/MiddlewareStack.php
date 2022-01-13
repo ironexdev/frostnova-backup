@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\Core;
+namespace App\Core\MiddlewareStack;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-// Based on https://github.com/idealo/php-middleware-stack
 class MiddlewareStack implements RequestHandlerInterface
 {
     /**
@@ -25,6 +24,20 @@ class MiddlewareStack implements RequestHandlerInterface
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $middleware = $this->middlewares[0] ?? null;
+
+        return $middleware ? $middleware->process(
+                $request,
+                $this->withoutMiddleware($middleware)
+            ) : $this->defaultResponse;
+    }
+
+    /**
      * @param MiddlewareInterface $middleware
      * @return RequestHandlerInterface
      */
@@ -39,19 +52,5 @@ class MiddlewareStack implements RequestHandlerInterface
                 }
             )
         );
-    }
-
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        $middleware = $this->middlewares[0] ?? null;
-
-        return $middleware ? $middleware->process(
-                $request,
-                $this->withoutMiddleware($middleware)
-            ) : $this->defaultResponse;
     }
 }

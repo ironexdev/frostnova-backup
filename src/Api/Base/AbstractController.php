@@ -3,51 +3,55 @@
 namespace App\Api\Base;
 
 use App\Enum\ContentTypeEnum;
+use App\Enum\RequestHeaderEnum;
 use App\Enum\ResponseHeaderEnum;
-use App\Enum\ResponseStatusCodeEnum;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 abstract class AbstractController
 {
-    public function __construct(private StreamFactoryInterface $streamFactory)
-    {}
-
-    protected function htmlResponse(
-        string            $html,
-        ResponseInterface $response,
-        int               $status = ResponseStatusCodeEnum::OK,
-        array             $headers = []
-    ): ResponseInterface
+    public function __construct(
+        private StreamFactoryInterface $streamFactory
+    )
     {
-        foreach ($headers as $key => $value) {
-            $response->withHeader($key, $value);
-        }
-
-        $responseBody = $this->streamFactory->createStream($html);
-
-        return $response
-            ->withStatus($status)
-            ->withHeader(ResponseHeaderEnum::CONTENT_TYPE, ContentTypeEnum::HTML)
-            ->withBody($responseBody);
     }
 
-    protected function jsonResponse(
+    protected function response(
         object            $parameters,
-        ResponseInterface $response,
-        int               $status = ResponseStatusCodeEnum::OK,
-        array             $headers = []
+        RequestInterface  $request,
+        ResponseInterface $response
     ): ResponseInterface
     {
-        foreach ($headers as $key => $value) {
-            $response->withHeader($key, $value);
+        if (!$response->getHeaderLine(ResponseHeaderEnum::CONTENT_TYPE)) {
+            $response = $response->withHeader(
+                ResponseHeaderEnum::CONTENT_TYPE,
+                $request->getHeaderLine(RequestHeaderEnum::ACCEPT) ?? ContentTypeEnum::JSON
+            );
         }
 
-        $responseBody = $this->streamFactory->createStream(json_encode($parameters));
+        $responseContentType = $response->getHeaderLine(ResponseHeaderEnum::CONTENT_TYPE);
 
-        return $response
-            ->withStatus($status)
-            ->withHeader(ResponseHeaderEnum::CONTENT_TYPE, ContentTypeEnum::JSON)
-            ->withBody($responseBody);
+        if ($responseContentType === ContentTypeEnum::HTML) {
+            $responseBody = $this->streamFactory->createStream(
+                $this->html($parameters)
+            );
+        } else {
+            $responseBody = $this->streamFactory->createStream(
+                $this->json($parameters)
+            );
+        }
+
+        return $response->withBody($responseBody);
+    }
+
+    private function html(object $parameters): string
+    {
+        return (string) $parameters;
+    }
+
+    private function json(object $parameters): string
+    {
+        return json_encode($parameters);
     }
 }

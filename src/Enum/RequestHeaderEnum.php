@@ -1,9 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
 namespace App\Enum;
 
-enum RequestHeaderEnum: string
+class RequestHeaderEnum
 {
-    use EnumTrait;
-    const CONTENT_TYPE = "Content-Type";
+    const ACCEPT = "Accept";
 }

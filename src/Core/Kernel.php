@@ -2,39 +2,20 @@
 
 namespace App\Core;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
-use App\Enum\ResponseStatusCodeEnum;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class Kernel
 {
     public function __construct(
-        ResponseInterface                $defaultResponse,
-        Router                           $router,
-        ServerRequestInterface           $serverRequest
+        ServerRequestInterface  $serverRequest,
+        RequestHandlerInterface $middlewareStack
     )
     {
-        Session::start();
-        Session::regenerate();
-
-        $response = $this->processRequest($defaultResponse, $router, $serverRequest);
+        $response = $middlewareStack->handle($serverRequest);
 
         $this->sendResponse($response->getStatusCode(), $response->getHeaders(), $response->getBody());
-    }
-
-    private function processRequest(
-        ResponseInterface        $defaultResponse,
-        Router                   $router,
-        ServerRequestInterface   $serverRequest): ResponseInterface
-    {
-        $middlewareStack = new MiddlewareStack(
-            $defaultResponse->withStatus(ResponseStatusCodeEnum::NOT_FOUND), // default/fallback response
-            // ...middlewares
-            $router
-        );
-
-        return $middlewareStack->handle($serverRequest);
     }
 
     /**

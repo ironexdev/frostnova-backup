@@ -1,46 +1,80 @@
 <?php
 
-use Monolog\Formatter\JsonFormatter;
-use Monolog\Logger as MonologLogger;
+use App\Core\MiddlewareStack\MiddlewareStack;
 use App\Enum\ContentTypeEnum;
-use App\Logger\Logger;
+use App\Enum\RequestMethodEnum;
+use App\Enum\ResponseHeaderEnum;
+use App\Enum\ResponseStatusCodeEnum;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use App\Core\Router;
-use Monolog\Handler\StreamHandler;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Http\Message\UploadedFileFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Tuupola\Middleware\CorsMiddleware;
 
 const DS = DIRECTORY_SEPARATOR;
 
 return [
-    /* Custom Interfaces *****************************************************/
+    /* Custom ****************************************************************/
     /*************************************************************************/
-
     // Implements PSR-15
     Router::class => DI\factory(function (ContainerInterface $container, ResponseFactoryInterface $responseFactory) {
         $routes = require_once(APP_DIRECTORY . DS . ".." . DS . "config" . DS . "api" . DS . "base" . DS . "routes.php");
         return new Router($container, $responseFactory, $routes);
     }),
 
+    // Implements PSR-15
+    RequestHandlerInterface::class => DI\factory(function (
+        ResponseInterface        $defaultResponse,
+        CorsMiddleware           $corsMiddleware,
+        Router                   $router
+    ): RequestHandlerInterface {
+        return new MiddlewareStack(
+            $defaultResponse->withStatus(ResponseStatusCodeEnum::NOT_FOUND), // Default/fallback response
+            $corsMiddleware, // Add CORS headers to the response if needed
+            // Add other middlewares
+            $router
+        );
+    }),
+
+    /* 3rd Party *************************************************************/
+    /*************************************************************************/
+    // Tuupola, CORS
+    CorsMiddleware::class => DI\factory(function () {
+
+        return new CorsMiddleware([
+            "origin" => [ // Access-Control-Allow-Origin
+                "http://client.local"
+            ],
+            "methods" => [ // Access-Control-Allow-Methods
+                RequestMethodEnum::DELETE,
+                RequestMethodEnum::GET,
+                RequestMethodEnum::HEAD,
+                RequestMethodEnum::OPTIONS,
+                RequestMethodEnum::PATCH,
+                RequestMethodEnum::POST,
+                RequestMethodEnum::PUT
+            ],
+            "headers.allow" => [ // Access-Control-Allow-Headers
+
+            ],
+            "headers.expose" => [ // Access-Control-Expose-Headers
+
+            ],
+            "credentials" => true, // Access-Control-Allow-Credentials
+            "cache" => 0
+        ]);
+    }),
+
     // PSR interfaces ********************************************************/
     /*************************************************************************/
-
-    // PSR-3
-    LoggerInterface::class => DI\factory(function () {
-        $logger = new Logger("debug");
-        $fileHandler = new StreamHandler($_ENV["DEBUG_LOG"], MonologLogger::DEBUG);
-        $formatter = new JsonFormatter();
-        $formatter->includeStacktraces();
-        $fileHandler->setFormatter($formatter);
-        $logger->pushHandler($fileHandler);
-
-        return $logger;
-    }),
 
     // PSR-7
     ResponseInterface::class => DI\factory(function (ResponseFactoryInterface $responseFactory) {
@@ -49,17 +83,22 @@ return [
     ResponseFactoryInterface::class => DI\autowire(Psr17Factory::class),
 
     // PSR-15
-    ServerRequestInterface::class => DI\factory(function (Psr17Factory $psr17Factory) {
+    ServerRequestInterface::class => DI\factory(function (
+        ServerRequestFactoryInterface $serverRequestFactory,
+        StreamFactoryInterface        $streamFactory,
+        UploadedFileFactoryInterface  $uploadedFileFactory,
+        UriFactoryInterface           $uriFactory
+    ) {
         $creator = new ServerRequestCreator(
-            $psr17Factory,
-            $psr17Factory,
-            $psr17Factory,
-            $psr17Factory
+            $serverRequestFactory,
+            $uriFactory,
+            $uploadedFileFactory,
+            $streamFactory
         );
 
         $serverRequest = $creator->fromGlobals();
 
-        $contentType = $serverRequest->getHeaderLine("Content-Type");
+        $contentType = $serverRequest->getHeaderLine(ResponseHeaderEnum::CONTENT_TYPE);
 
         // Parse request body, because Nyholm\Psr7Server doesn't parse JSON requests
         if ($contentType === ContentTypeEnum::JSON) {
@@ -77,5 +116,10 @@ return [
 
         return $serverRequest;
     }),
+
+    // PSR-17
+    ServerRequestFactoryInterface::class => DI\autowire(Psr17Factory::class),
     StreamFactoryInterface::class => DI\autowire(Psr17Factory::class),
+    UploadedFileFactoryInterface::class => DI\autowire(Psr17Factory::class),
+    UriFactoryInterface::class => DI\autowire(Psr17Factory::class)
 ];

@@ -1,11 +1,8 @@
 <?php declare(strict_types=1);
 
-use App\Enum\ContentTypeEnum;
-use App\Enum\RequestHeaderEnum;
-use App\Enum\ResponseStatusCodeEnum;
-use Psr\Log\LoggerInterface;
 use App\Enum\EnvironmentEnum;
 use App\Core\Kernel;
+use App\Enum\ResponseStatusCodeEnum;
 use DI\ContainerBuilder;
 
 if ($_ENV["ERROR_REPORTING"] === "true") {
@@ -38,50 +35,17 @@ $container = $containerBuilder->build();
 
 try {
     $container->make(Kernel::class);
-} catch (Throwable $e) {
-    $errorCode = $e->getCode() ?: ResponseStatusCodeEnum::INTERNAL_SERVER_ERROR;
+} catch (Throwable $throwable) {
+    $errorCode = $throwable->getCode() ?? ResponseStatusCodeEnum::INTERNAL_SERVER_ERROR;
 
-    $logger = $container->get(LoggerInterface::class);
-    $logger->error($e->getMessage(), $e->getTrace());
-
-    if ($_ENV["ENVIRONMENT"] === EnvironmentEnum::DEVELOPMENT) {
-        if ($errorCode >= ResponseStatusCodeEnum::BAD_REQUEST && $errorCode < ResponseStatusCodeEnum::INTERNAL_SERVER_ERROR) {
-            errorResponse($errorCode, $e->getMessage());
-        } else {
-            throw $e;
-        }
+    if ($_ENV["ENVIRONMENT"] === EnvironmentEnum::DEVELOPMENT) { // Development
+        // Throw server error
+        throw $throwable;
     } else {
         if ($errorCode >= ResponseStatusCodeEnum::BAD_REQUEST && $errorCode < ResponseStatusCodeEnum::INTERNAL_SERVER_ERROR) {
-            errorResponse($errorCode, $e->getMessage());
+            http_response_code(ResponseStatusCodeEnum::NOT_FOUND); // Throw 404 instead of client error
         } else {
-            errorResponse(ResponseStatusCodeEnum::INTERNAL_SERVER_ERROR);
-        }
-    }
-}
-
-function errorResponse(int $code, string $message = null)
-{
-    if ($message) {
-        if($_SERVER["CONTENT_TYPE"] === ContentTypeEnum::JSON)
-        {
-            http_response_code($code); // Show any >= 400 && < 500 error code to client (which should hide it from end-user)
-            header(RequestHeaderEnum::CONTENT_TYPE . ":" . ContentTypeEnum::JSON);
-            echo json_encode([
-                "errors" => [
-                    "message" => $message
-                ]
-            ]);
-        }
-        else
-        {
-            http_response_code(ResponseStatusCodeEnum::NOT_FOUND); // Only show error 404 to end-user
-            header(RequestHeaderEnum::CONTENT_TYPE . ":" . ContentTypeEnum::HTML);
-
-            echo json_encode([
-                "errors" => [
-                    "message" => $message
-                ]
-            ]);
+            http_response_code($errorCode); // Throw any server error
         }
     }
 }

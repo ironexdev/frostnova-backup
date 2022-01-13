@@ -2,9 +2,7 @@
 
 namespace App\Enum;
 
-enum ResponseHeaderEnum: string
+class ResponseHeaderEnum
 {
-    use EnumTrait;
-    const CONTENT_LENGTH = "Content-Length";
     const CONTENT_TYPE = "Content-Type";
 }

@@ -2,10 +2,8 @@
 
 namespace App\Enum;
 
-enum ResponseStatusCodeEnum: int
+class ResponseStatusCodeEnum
 {
-    use EnumTrait;
-
     /* INFORMATIONAL */
     const CONTINUE = 100;
     const SWITCHING_PROTOCOLS = 101;

@@ -2,10 +2,8 @@
 
 namespace App\Enum;
 
-enum ContentTypeEnum: string
+class ContentTypeEnum: string
 {
-    use EnumTrait;
-
     const HTML = "text/html";
     const JSON = "application/json";
 }

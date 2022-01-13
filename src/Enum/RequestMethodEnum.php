@@ -2,10 +2,8 @@
 
 namespace App\Enum;
 
-enum RequestMethodEnum: string
+class RequestMethodEnum
 {
-    use EnumTrait;
-
     const DELETE = "DELETE";
     const GET = "GET";
     const HEAD = "HEAD";
