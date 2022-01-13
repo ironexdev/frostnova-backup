@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-use App\Enum\EnvironmentEnum;
-use App\Core\Kernel;
-use App\Enum\ResponseStatusCodeEnum;
+use Frostnova\Enum\EnvironmentEnum;
+use Frostnova\Core\Kernel;
+use Frostnova\Enum\ResponseStatusCodeEnum;
 use DI\ContainerBuilder;
 
 if ($_ENV["ERROR_REPORTING"] === "true") {

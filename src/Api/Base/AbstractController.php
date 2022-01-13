@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Api\Base;
+namespace Frostnova\Api\Base;
 
-use App\Enum\ContentTypeEnum;
-use App\Enum\RequestHeaderEnum;
-use App\Enum\ResponseHeaderEnum;
+use Frostnova\Enum\ContentTypeEnum;
+use Frostnova\Enum\RequestHeaderEnum;
+use Frostnova\Enum\ResponseHeaderEnum;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamFactoryInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enum;
+namespace Frostnova\Enum;
 
 class RequestHeaderEnum
 {

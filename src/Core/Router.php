@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Core;
+namespace Frostnova\Core;
 
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;

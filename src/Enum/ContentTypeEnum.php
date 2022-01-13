@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Enum;
+namespace Frostnova\Enum;
 
 class ContentTypeEnum: string
 {

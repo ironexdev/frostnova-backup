@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Api\Base\Home;
+namespace Frostnova\Api\Base\Home;
 
-use App\Api\Base\AbstractController;
+use Frostnova\Api\Base\AbstractController;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 

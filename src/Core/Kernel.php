@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Core;
+namespace Frostnova\Core;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
