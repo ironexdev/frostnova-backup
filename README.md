@@ -1,6 +1,7 @@
-# Frost Nova
+# Frost Nova 
+_You don't always need a framework_
 
-Micro framework that provides Dependency Injection and Controllers to handle http requests.
+Project starter pack that provides Dependency Injection and Controllers to handle http requests.
 - Dependency Injection (PSR-11 Container)
 - Routing (PSR-15 Server Request, PSR-7 Response)
 - Middleware Stack (PSR-15 Middleware)

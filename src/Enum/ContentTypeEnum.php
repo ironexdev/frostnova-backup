@@ -2,7 +2,7 @@
 
 namespace App\Enum;
 
-class ContentTypeEnum: string
+class ContentTypeEnum
 {
     const HTML = "text/html";
     const JSON = "application/json";

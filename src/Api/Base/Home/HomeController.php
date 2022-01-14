@@ -10,6 +10,10 @@ class HomeController extends AbstractController
 {
     public function default(RequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        return $this->response((object) [], $request, $response);
+        // $response = $response->withHeader("Content-Type", "text/html");
+
+        return $this->response((object) [
+            "Frost" => "Nova"
+        ], $request, $response);
     }
 }

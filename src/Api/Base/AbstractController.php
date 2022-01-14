@@ -47,7 +47,7 @@ abstract class AbstractController
 
     private function html(object $parameters): string
     {
-        return (string) $parameters;
+        return "<html lang='en'><head><title>Frostnova</title></head><body>" . var_export($parameters, true) . "</body></html>";
     }
 
     private function json(object $parameters): string
