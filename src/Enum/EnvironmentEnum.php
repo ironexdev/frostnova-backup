@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Frostnova\Enum;
+namespace App\Enum;
 
 class EnvironmentEnum
 {
