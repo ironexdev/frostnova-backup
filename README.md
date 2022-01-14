@@ -15,6 +15,8 @@ Project starter pack that provides Dependency Injection and Controllers to handl
 4) [src/Core/Router.php](https://github.com/ironexdev/frostnova-app/blob/master/src/Core/Router.php)
     - Request method and path is matched against route definition in [config/api/base/config.php](https://github.com/ironexdev/frostnova-app/blob/master/config/api/base/routes.php)
 
+5) src/Api/Base/\<Controller\>::\<method\>
+
 **Dependency Injection**
 - Defined in [config/config-di.php](https://github.com/ironexdev/frostnova-app/blob/master/config/config-di.php)
 
