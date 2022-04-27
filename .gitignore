@@ -1,7 +1,10 @@
 .DS_Store
 node_modules
 /dist
+
+# Composer
 vendor
+composer.lock
 
 # local env files
 .env.local

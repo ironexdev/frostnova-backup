@@ -6,7 +6,7 @@
   },
   "name": "ironex/frostnova",
   "require": {
-    "php": "8.0.10",
+    "php": "^8.0.10",
     "php-di/php-di": "^6.0",
     "psr/container": "1.1.1",
     "filp/whoops": "^2.14",
